@@ -12,7 +12,7 @@
           </el-col>
           <el-col :span="2" :offset="7">
             <el-button type="primary" @click="showFormatCheckbox = true"
-              >将磁盘格式化</el-button
+              >格式化</el-button
             >
           </el-col>
           <!-- 上一级按钮 -->
@@ -43,9 +43,9 @@
         </el-row>
       </el-header>
       <el-container>
-        <!-- 磁盘侧边栏 -->
+        <!-- 侧边栏 -->
         <el-aside>
-          <el-row>磁盘块</el-row>
+          <el-row>内存块</el-row>
           <el-table :data="block" stripe style="width: 100%" height="700px">
             <el-table-column prop="blockNo" label="编号"> </el-table-column>
             <el-table-column label="存放内容" width="150">
@@ -182,7 +182,7 @@
     </el-dialog>
     <!-- 格式化确认对话框 -->
     <el-dialog :visible.sync="this.showFormatCheckbox" title="确认是否删除">
-      <span>确认要格式化磁盘吗？此操作不可逆！</span>
+      <span>确认要格式化吗？此操作不可逆！</span>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="showFormatCheckbox = false">取消</el-button>
@@ -233,7 +233,7 @@ export default {
       }
       return fmt;
     };
-    var directoryItem = function (
+    var dirItem = function (
       filename,
       isDirectory,
       startPos,
@@ -256,9 +256,9 @@ export default {
       this.content = blockContent;
       this.blockSimCon = blockSimCon; //简略内容
       this.nextBlock = nextBlock; //链接
-    }; //磁盘块数据结构
+    }; //内存块数据结构
     return {
-      createItem: directoryItem, //1个块装32个item
+      createItem: dirItem, //1个块装32个item
       createDirectory: directory,
       createBlock: block,
 
@@ -342,7 +342,7 @@ export default {
     //created
     this.blockNum = 200;
     this.blockSize = 32;
-    //初始化磁盘块，存储信息
+    //初始化内存块，存储信息
     if (checkInfor != null)
       this.block = JSON.parse(localStorage.getItem("blockInfor"));
     else {
@@ -373,7 +373,7 @@ export default {
     console.log(this.pathList);
   },
   methods: {
-    //格式化磁盘
+    //格式化
     initall: function () {
       this.showFormatCheckbox = false;
       this.showDeleteCheckbox = false;
@@ -392,7 +392,7 @@ export default {
       //created
       this.blockNum = 200;
       this.blockSize = 32;
-      //初始化磁盘块，存储信息
+      //初始化内存块，存储信息
       for (var i = 0; i < this.blockNum; i++) {
         this.block.push(new this.createBlock(i, i + 1)); //创建物理块
       }
@@ -501,10 +501,10 @@ export default {
         this.showDialogContent = false;
       }
     },
-    //回收磁盘块 nowdeleBlock为要回收的磁盘块序列的起始
+    //回收内存块 nowdeleBlock为要回收的内存块序列的起始
     recycleBlock: function (nowdeleteBlock) {
       while (nowdeleteBlock !== -1) {
-        //将nowdeleteBlock为首的后续存储磁盘块释放回收
+        //将nowdeleteBlock为首的后续存储内存块释放回收
         this.block[nowdeleteBlock].blockSimCon = "";
         this.block[nowdeleteBlock].content = "";
         var p = this.block[nowdeleteBlock].nextBlock;
@@ -592,7 +592,6 @@ export default {
                 "yyyy-MM-dd hh:mm:ss"
               ); //更新修改时间
             }
-
             if (
               this.block[curDirStartBlock].content.dirList.length === 0 &&
               curDirStartBlock !== 0
@@ -610,6 +609,7 @@ export default {
               this.block[curDirStartBlock].nextBlock = this.freeBlock;
               this.freeBlock = curDirStartBlock;
             }
+            this.isChanged=!this.isChanged;
             return;
           } //
         }
@@ -642,7 +642,7 @@ export default {
         var dirBlock = this.freeBlock; //获取最前空闲块
         this.freeBlock = this.block[this.freeBlock].nextBlock; //空闲块指针后移
         this.block[dirBlock].nextBlock = -1; //将返还的块 封闭
-        this.block[dirBlock].content = new this.createDirectory(); //将块初始化 磁盘块的内容为directory列表
+        this.block[dirBlock].content = new this.createDirectory(); //将块初始化 内存块的内容为directory列表
         this.block[dirBlock].blockSimCon = "目录项"; //目录项
         return dirBlock;
       }
@@ -765,22 +765,9 @@ export default {
       else this.showDialogDir = false;
 
       this.newName = "";
-      console.log("finish");
+      
       this.isChanged=!this.isChanged;
-      console.log("init1");
-
-      var curItemArray = new Array();
-      var cur1 = this.currentDirectory; //块号
-      while (cur1 !== -1) {
-        for (var ii = 0; ii < this.block[cur1].content.dirList.length; ii++) {
-          //console.log(this.block[cur].content.dirList[i]);
-          curItemArray.push(this.block[cur1].content.dirList[ii]);
-        }
-        cur1 = this.block[cur1].nextBlock;
-      }
-      console.log("update1");
-      console.log(curItemArray);
-      this.currentDirectoryList = curItemArray;
+      console.log("finish");
     },
     geticonUrl: function (isDirectory) {
       return isDirectory
@@ -820,7 +807,7 @@ export default {
         Notification({
           title: "说明1",
           message:
-            "本系统目录项占用磁盘空间,磁盘块共200块,每块32KB(1KB可存10个字符或1个目录项),初创文件时文件为空,大小为0,文件夹大小不包括子文件(夹)",
+            "本系统目录项占用内存空间,内存块共200块,每块32KB(1KB可存10个字符或1个目录项),初创文件时文件为空,大小为0,文件夹大小不包括子文件(夹)",
           type: "info",
           duration: 5000,
         }),
@@ -831,7 +818,7 @@ export default {
         Notification({
           title: "说明2",
           message:
-            "磁盘块存放内容可能为目录项或文件内容,若为目录项则显示目录路径,若为文件则只显示该块中前10个字符",
+            "内存块存放内容可能为目录项或文件内容,若为目录项则显示目录路径,若为文件则只显示该块中前10个字符",
           type: "info",
           duration: 5000,
         }),
