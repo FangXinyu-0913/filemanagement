@@ -40,12 +40,6 @@
               @click="showDialogFile = true"
             ></el-button>
           </el-col>
-          <!-- <el-col :span="3">
-            <el-input
-              v-model="input"
-              placeholder="请输入要创建的文件名"
-            ></el-input>
-          </el-col> -->
         </el-row>
       </el-header>
       <el-container>
@@ -85,15 +79,6 @@
                       scope.row.filename
                     }}</span>
                   </div>
-                  <!-- <el-tag
-                    :class="
-                      scope.row.isDirectory
-                        ? 'el-icon-folder'
-                        : 'el-icon-document'
-                    "
-                  >
-                    {{ scope.row.filename }}
-                  </el-tag> -->
                 </template>
               </el-table-column>
               <el-table-column label="种类">
@@ -209,9 +194,7 @@
 </template>
 
 <script>
-// import { menusEvent } from "vue3-menus";
 import { Notification } from "element-ui";
-// import { ElMessage } from "element-plus";
 export default {
   name: "Home",
   data() {
@@ -339,7 +322,7 @@ export default {
       return str;
     },
   },
-  created() {
+  created() {//与缓存联系
     var checkInfor = JSON.parse(localStorage.getItem("rootDir"));
     console.log(checkInfor);
     this.showFormatCheckbox = false;
@@ -652,14 +635,7 @@ export default {
       this.deleteName = deleteName;
       this.showDeleteCheckbox = true;
     },
-    // curPath: function () {
-    //   var str = "";
-    //   str += this.pathList[0].filename;
-    //   for (var i = 1; i < this.pathList.length; i++) {
-    //     str += "\\" + this.pathList[i].filename;
-    //   }
-    //   return str;
-    // },
+    
     //为目录分配块空间（单块）
     allocateFreeBlockForDirectory: function () {
       if (this.freeBlock !== -1) {
@@ -805,9 +781,6 @@ export default {
       console.log("update1");
       console.log(curItemArray);
       this.currentDirectoryList = curItemArray;
-
-      // var test = this.currentDirectoryList;
-      //console.log(this.currentDirectoryList);
     },
     geticonUrl: function (isDirectory) {
       return isDirectory
@@ -845,9 +818,20 @@ export default {
     setTimeout(
       () =>
         Notification({
-          title: "说明",
+          title: "说明1",
           message:
             "本系统目录项占用磁盘空间,磁盘块共200块,每块32KB(1KB可存10个字符或1个目录项),初创文件时文件为空,大小为0,文件夹大小不包括子文件(夹)",
+          type: "info",
+          duration: 5000,
+        }),
+      1000
+    );
+    setTimeout(
+      () =>
+        Notification({
+          title: "说明2",
+          message:
+            "磁盘块存放内容可能为目录项或文件内容,若为目录项则显示目录路径,若为文件则只显示该块中前10个字符",
           type: "info",
           duration: 5000,
         }),
@@ -858,29 +842,9 @@ export default {
 </script>
 
 <style scoped>
-.text {
-  font-size: 14px;
-}
-
-.item {
-  margin-bottom: 18px;
-}
-
-.clearfix:before,
-.clearfix:after {
-  display: table;
-  content: "";
-}
-.clearfix:after {
-  clear: both;
-}
-
 .MineIcon {
   width: 30px;
   height: 30px;
 }
 
-.box-card {
-  width: 480px;
-}
 </style>
